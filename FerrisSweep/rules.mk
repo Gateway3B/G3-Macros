@@ -1,0 +1,7 @@
+TAP_DANCE_ENABLE = yes
+MOUSEKEY_ENABLE = yes
+KEY_OVERRIDE_ENABLE = yes
+COMBO_ENABLE = yes
+SEND_STRING_ENABLE = yes
+
+SRC += keymapstring.c
