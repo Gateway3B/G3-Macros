@@ -3,8 +3,8 @@
 #SingleInstance force
 
 RAlt::GoogleBang()
-AppsKey::TogglePin()
 RCtrl::SendInput #n
 
+; AppsKey::T
 ; RWin::
 ; Media_Stop::

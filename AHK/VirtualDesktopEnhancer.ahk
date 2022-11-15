@@ -4,7 +4,7 @@ DetectHiddenWindows, On
 hwnd:=WinExist("ahk_pid " . DllCall("GetCurrentProcessId","Uint"))
 hwnd+=0x1000<<32
 
-hVirtualDesktopAccessor := DllCall("LoadLibrary", Str, "VirtualDesktopAccessor.dll", "Ptr") 
+hVirtualDesktopAccessor := DllCall("LoadLibrary", Str, "VirtualDesktopAccessor.dll", "Ptr")
 MoveWindowToDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "MoveWindowToDesktopNumber", "Ptr")
 RegisterPostMessageHookProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "RegisterPostMessageHook", "Ptr")
 UnregisterPostMessageHookProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "UnregisterPostMessageHook", "Ptr")
@@ -19,30 +19,44 @@ OnExplorerRestart(wParam, lParam, msg, hwnd)
     DllCall(RestartVirtualDesktopAccessorProc, UInt, result)
 }
 
-WinWait, Spotify
-spotify := WinExist("Spotify")
-; MsgBox, % spotify
+global Monitors:=[]
 
-WinWait, ahk_exe Discord.exe
-discord := WinExist("ahk_exe" "Discord.exe")
-; MsgBox, % discord
-
-pinList := []
+SysGet, Mon, Monitor, 3
+Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
+SysGet, Mon, Monitor, 4
+Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
+SysGet, Mon, Monitor, 5
+Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
 
 ; Windows 10 desktop changes listener
 DllCall(RegisterPostMessageHookProc, Int, hwnd, Int, 0x1400 + 30)
 OnMessage(0x1400 + 30, "VWMess")
 VWMess(wParam, lParam, msg, hwnd)
 {
-    global MoveWindowToDesktopNumberProc, discord, spotify, pinList
+    ; global MoveWindowToDesktopNumberProc, discord, spotify, pinList
 
-	DllCall(MoveWindowToDesktopNumberProc, UInt, discord, UInt, lParam)
+    ; DllCall(MoveWindowToDesktopNumberProc, UInt, discord, UInt, lParam)
 
-	DllCall(MoveWindowToDesktopNumberProc, UInt, spotify, UInt, lParam)
+    ; DllCall(MoveWindowToDesktopNumberProc, UInt, spotify, UInt, lParam)
+    global MoveWindowToDesktopNumberProc
 
-    Loop, % pinList.count()
+    WinGet List, List
+
+    Loop % List
     {
-	    DllCall(MoveWindowToDesktopNumberProc, UInt, pinList[A_Index], UInt, lParam)
-    }
+        WinHwnd:=List%A_Index%
 
+        WinGetPos,x,y,w,h,% "ahk_id " WinHwnd
+        cx:=x+w/2
+        cy:=y+h/2
+
+        For index, Mon in Monitors
+        {
+            If (cx>=Mon.Left && cx<Mon.Right && cy>=Mon.Top && cy<Mon.Bottom)
+            {
+                ; MsgBox %WinHwnd%
+                DllCall(MoveWindowToDesktopNumberProc, UInt, WinHwnd, UInt, lParam)
+            }
+        }
+    }
 }

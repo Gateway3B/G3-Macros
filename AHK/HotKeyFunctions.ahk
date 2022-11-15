@@ -1,4 +1,3 @@
-
 ; Google bang
 GoogleBang()
 {
@@ -62,23 +61,4 @@ ToggleSleep()
 	}
 	Sleep 100
 	WinClose, Settings
-}
-
-TogglePin()
-{
-    global pinList
-    temp := WinExist("A")
-    temp := temp + 0
-    If (temp)
-    {
-        Loop, % pinList.Length()
-        {
-            if (pinList[A_Index] = temp)
-            {
-                pinList.RemoveAt(A_Index)
-                return
-            }
-        }
-        pinList.Push(temp)
-    }
 }
