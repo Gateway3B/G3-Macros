@@ -3,7 +3,7 @@
 #SingleInstance force
 
 RAlt::GoogleBang()
-RCtrl::SendInput #n
+; RCtrl::SendInput #n
 
 ; AppsKey::T
 ; RWin::
