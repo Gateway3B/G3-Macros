@@ -17,7 +17,7 @@ enum ferris_layers {
     const key_override_t parend_key_override =                  ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_PAREN,            KC_RIGHT_PAREN);            // ( )
     const key_override_t brace_key_override =                   ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_CURLY_BRACE,      KC_RIGHT_CURLY_BRACE);      // { }
     const key_override_t bracket_key_override =                 ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_BRACKET,          KC_RIGHT_BRACKET);          // [ ]
-    const key_override_t abracket_key_override =                ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_ANGLE_BRACKET,    KC_RIGHT_ANGLE_BRACKET);    // < >
+    const key_override_t abracket_key_override =                ko_make_with_layers_and_negmods(MOD_MASK_SHIFT, KC_LEFT_ANGLE_BRACKET,    KC_RIGHT_ANGLE_BRACKET, ~0, MOD_MASK_ALT);    // < >
 
     const key_override_t dollar_percent_key_override =          ko_make_basic(MOD_MASK_SHIFT, KC_DOLLAR,                KC_PERCENT);                // $ %
     const key_override_t octothorpe_at_key_override =           ko_make_basic(MOD_MASK_SHIFT, KC_HASH,                  KC_AT);                     // # @
@@ -38,6 +38,16 @@ enum ferris_layers {
     const key_override_t rightspace_key_override =              ko_make_with_layers_and_negmods(0,  KC_RIGHT,           LCTL(LGUI(KC_RIGHT)), (1 << MOUSE), MOD_MASK_SHIFT);
     const key_override_t left_tableft_key_override =            ko_make_with_layers(MOD_MASK_SHIFT, KC_LEFT,            LCTL(KC_PAGE_UP), (1 << MOUSE));
     const key_override_t right_tabright_key_override =          ko_make_with_layers(MOD_MASK_SHIFT, KC_RIGHT,           LCTL(KC_PAGE_DOWN), (1 << MOUSE));
+
+    const key_override_t enter_application_key_override =       ko_make_basic(MOD_MASK_ALT, KC_ENTER,                   KC_APPLICATION); // Alt enter combo right clicks
+
+    const key_override_t anglebracket_tabrev_key_override =     ko_make_basic(MOD_MASK_SA, KC_LEFT_ANGLE_BRACKET,       LALT(LSFT(KC_TAB))); // App cycle reverse
+    const key_override_t dot_tabrev_key_override =              ko_make_basic(MOD_MASK_SA, KC_DOT,                      LALT(LSFT(KC_TAB))); // App cycle reverse
+    const key_override_t anglebracket_tab_key_override =        ko_make_with_layers_and_negmods(MOD_MASK_ALT, KC_LEFT_ANGLE_BRACKET,      LALT(KC_TAB), (1 << NAVIGATION), MOD_MASK_SHIFT); // App cycle
+    const key_override_t dot_tab_key_override =                 ko_make_with_layers_and_negmods(MOD_MASK_ALT, KC_DOT,                     LALT(KC_TAB), (1 << NAVIGATION), MOD_MASK_SHIFT); // App cycle
+    
+    const key_override_t right_tabright_nav_key_override =      ko_make_with_layers(MOD_MASK_SA, KC_RIGHT,              LCTL(KC_PAGE_DOWN), (1 << NAVIGATION));
+    const key_override_t left_tableft_nav_key_override =        ko_make_with_layers(MOD_MASK_SA, KC_LEFT,               LCTL(KC_PAGE_UP), (1 << NAVIGATION));
 
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
@@ -69,6 +79,16 @@ enum ferris_layers {
         &left_tableft_key_override,
         &right_tabright_key_override,
 
+        &enter_application_key_override,
+        
+        &anglebracket_tabrev_key_override,
+        &dot_tabrev_key_override,
+        &anglebracket_tab_key_override,
+        &dot_tab_key_override,
+
+        &right_tabright_nav_key_override,
+        &left_tableft_nav_key_override,
+
         NULL
     };
 
@@ -90,7 +110,6 @@ enum ferris_layers {
 
     enum ferris_tap_dances {
         TD_LCTRL_LGUI,
-        TD_LALT_LCTRL,
         TD_LayerNav_LayerMouse
     };
 
@@ -133,16 +152,16 @@ enum ferris_layers {
 
     qk_tap_dance_action_t tap_dance_actions[] = {
         [TD_LCTRL_LGUI] = ACTION_TAP_DANCE_DOUBLE(KC_LCTL, KC_LGUI),
-        [TD_LALT_LCTRL] = ACTION_TAP_DANCE_DOUBLE(KC_LALT, KC_LCTL),
         [TD_LayerNav_LayerMouse] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)
     };
 
 // endregion
 
-// region Custon Keycodes
+// region Custom Keycodes
 
     enum custom_keycodes {
-        KEYMAP_STRING = SAFE_RANGE
+        KEYMAP_STRING = SAFE_RANGE,
+        COLEMAK_CTRL
     };
 
     bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -152,7 +171,19 @@ enum ferris_layers {
                     send_string(keymapstring);
                 }
                 return false;
+
+            case COLEMAK_CTRL:
+                if (record->event.pressed) {
+                    layer_off(MOUSE);
+                    register_code(KC_LCTRL);
+                }
         }
+
+        if (record->event.key.col == 0 && record->event.key.row == 3 && !(record->event.pressed)) {
+            unregister_code(KC_LCTRL);
+            clear_mods();
+        }
+
         return true;
     };
 
@@ -161,13 +192,16 @@ enum ferris_layers {
 // region Combos
 
     enum combos {
-        COMMA_DOT_EXCLAIM
+        COMMA_DOT_EXCLAIM,
+        KEYMAP_COMBO
     };
 
     const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT};
+    const uint16_t PROGMEM keymap_combo[] = {KC_PRINT_SCREEN, KC_PAUSE};
 
     combo_t key_combos[COMBO_COUNT] = {
-        [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM)
+        [COMMA_DOT_EXCLAIM] =   COMBO(comma_dot_combo, KC_EXCLAIM),
+        [KEYMAP_COMBO] =        COMBO(keymap_combo, KEYMAP_STRING)
     };
 
 // endregion
@@ -224,9 +258,9 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_TAB, KC_MS_WH_LEFT, KC_MS_WH_DOWN, KC_MS_WH_RIGHT, KC_MEDIA_PLAY_PAUSE,                  KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LGUI, KC_SCROLL_LOCK, KC_PRINT_SCREEN, KC_PAUSE, KEYMAP_STRING,                          KC_RALT, KC_RGUI, KC_APPLICATION, KC_RCTRL, MAGIC_TOGGLE_CTL_GUI,
+            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, MAGIC_TOGGLE_CTL_GUI,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            TO(COLEMAK), KC_LSFT,                                                                       KC_MS_BTN1, KC_MS_BTN2
+            COLEMAK_CTRL, KC_LSFT,                                                                      KC_MS_BTN1, KC_MS_BTN2
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         )
     };
