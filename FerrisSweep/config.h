@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TAPPING_TERM 220
 #define RETRO_TAPPING
 
-#define COMBO_COUNT 2
+#define COMBO_COUNT 1
 
 #undef MK_3_SPEED
 #define MK_3_SPEED

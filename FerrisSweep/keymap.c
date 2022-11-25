@@ -8,6 +8,42 @@ enum ferris_layers {
     MOUSE,
 };
 
+// region Custom Keycodes
+
+    enum custom_keycodes {
+        KEYMAP_STRING = SAFE_RANGE,
+        COLEMAK_CTRL
+    };
+
+    bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+        switch (keycode) {
+            case KEYMAP_STRING:
+                if (record->event.pressed) {
+                    if (get_mods() & MOD_MASK_SHIFT) {
+                        process_magic(MAGIC_TOGGLE_CTL_GUI, record);
+                    } else {
+                        send_string(keymapstring);
+                    }
+                }
+                return false;
+
+            case COLEMAK_CTRL:
+                if (record->event.pressed) {
+                    layer_off(MOUSE);
+                    register_code(KC_LCTRL);
+                }
+        }
+
+        if (record->event.key.col == 0 && record->event.key.row == 3 && !(record->event.pressed)) {
+            unregister_code(KC_LCTRL);
+            clear_mods();
+        }
+
+        return true;
+    };
+
+// endregion
+
 // region Key Overrides
     const key_override_t comma_semicolon_key_override =         ko_make_basic(MOD_MASK_SHIFT, KC_COMMA,                 KC_SEMICOLON);              // , ;
     const key_override_t dot_colon_key_override =               ko_make_basic(MOD_MASK_SHIFT, KC_DOT,                   KC_COLON);                  // . :
@@ -49,6 +85,14 @@ enum ferris_layers {
     const key_override_t right_tabright_nav_key_override =      ko_make_with_layers(MOD_MASK_SA, KC_RIGHT,              LCTL(KC_PAGE_DOWN), (1 << NAVIGATION));
     const key_override_t left_tableft_nav_key_override =        ko_make_with_layers(MOD_MASK_SA, KC_LEFT,               LCTL(KC_PAGE_UP), (1 << NAVIGATION));
 
+    const key_override_t up_pgup_key_override =                 ko_make_with_layers_and_negmods(MOD_MASK_CTRL, KC_UP,   KC_PAGE_UP, (1 << NAVIGATION), MOD_MASK_ALT);
+    const key_override_t down_pgdown_key_override =             ko_make_with_layers_and_negmods(MOD_MASK_CTRL, KC_DOWN, KC_PAGE_DOWN, (1 << NAVIGATION), MOD_MASK_ALT);
+
+    const key_override_t forward_pgdown_key_override =          ko_make_with_layers(MOD_MASK_CTRL, KC_MS_BTN5,          KC_PAGE_UP, (1 << MOUSE));
+    const key_override_t backward_pgdown_key_override =         ko_make_with_layers(MOD_MASK_CTRL, KC_MS_BTN4,          KC_PAGE_DOWN, (1 << MOUSE));
+
+    const key_override_t mouse2_mouse3_key_override =           ko_make_with_layers(MOD_MASK_SHIFT, KC_MS_BTN2,          KC_MS_BTN3, (1 << MOUSE));
+
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
         &dot_colon_key_override,
@@ -88,6 +132,14 @@ enum ferris_layers {
 
         &right_tabright_nav_key_override,
         &left_tableft_nav_key_override,
+
+        &up_pgup_key_override,
+        &down_pgdown_key_override,
+
+        &forward_pgdown_key_override,
+        &backward_pgdown_key_override,
+
+        &mouse2_mouse3_key_override,
 
         NULL
     };
@@ -157,51 +209,16 @@ enum ferris_layers {
 
 // endregion
 
-// region Custom Keycodes
-
-    enum custom_keycodes {
-        KEYMAP_STRING = SAFE_RANGE,
-        COLEMAK_CTRL
-    };
-
-    bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-        switch (keycode) {
-            case KEYMAP_STRING:
-                if (record->event.pressed) {
-                    send_string(keymapstring);
-                }
-                return false;
-
-            case COLEMAK_CTRL:
-                if (record->event.pressed) {
-                    layer_off(MOUSE);
-                    register_code(KC_LCTRL);
-                }
-        }
-
-        if (record->event.key.col == 0 && record->event.key.row == 3 && !(record->event.pressed)) {
-            unregister_code(KC_LCTRL);
-            clear_mods();
-        }
-
-        return true;
-    };
-
-// endregion
-
 // region Combos
 
     enum combos {
         COMMA_DOT_EXCLAIM,
-        KEYMAP_COMBO
     };
 
     const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT};
-    const uint16_t PROGMEM keymap_combo[] = {KC_PRINT_SCREEN, KC_PAUSE};
 
     combo_t key_combos[COMBO_COUNT] = {
-        [COMMA_DOT_EXCLAIM] =   COMBO(comma_dot_combo, KC_EXCLAIM),
-        [KEYMAP_COMBO] =        COMBO(keymap_combo, KEYMAP_STRING)
+        [COMMA_DOT_EXCLAIM] =   COMBO(comma_dot_combo, KC_EXCLAIM)
     };
 
 // endregion
@@ -232,7 +249,7 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_ESCAPE, KC_PERCENT, KC_AT, KC_CIRCUMFLEX, KC_PIPE,                                       KC_MINS, KC_7, KC_8, KC_9, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_TAB, KC_DOT, KC_UNDERSCORE, KC_SLASH, KC_ASTERISK,                                       KC_PLUS, KC_4, KC_5, KC_6, KC_ENTER,
+            KC_COMMA, KC_DOT, KC_UNDERSCORE, KC_SLASH, KC_ASTERISK,                                     KC_PLUS, KC_4, KC_5, KC_6, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_LALT, KC_F3, KC_F1, KC_F2, KC_GRAVE,                                                     KC_EQUAL, KC_1, KC_2, KC_3, KC_TRANSPARENT,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
@@ -254,11 +271,11 @@ enum ferris_layers {
 
         [MOUSE] = LAYOUT(
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_ESCAPE, KC_ACL1, KC_MS_WH_UP, KC_ACL2, KC_AUDIO_VOL_UP,                                  KC_MS_BTN5, KC_LEFT, KC_MS_UP, KC_RIGHT, KC_BSPC,
+            KC_ESCAPE, KC_MS_WH_LEFT, KC_MS_WH_UP, KC_MS_WH_RIGHT, KC_AUDIO_VOL_UP,                     KC_MS_BTN5, KC_LEFT, KC_MS_UP, KC_RIGHT, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_TAB, KC_MS_WH_LEFT, KC_MS_WH_DOWN, KC_MS_WH_RIGHT, KC_MEDIA_PLAY_PAUSE,                  KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
+            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_ACL1, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, MAGIC_TOGGLE_CTL_GUI,
+            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, KEYMAP_STRING,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             COLEMAK_CTRL, KC_LSFT,                                                                      KC_MS_BTN1, KC_MS_BTN2
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
