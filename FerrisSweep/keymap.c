@@ -12,7 +12,8 @@ enum ferris_layers {
 
     enum custom_keycodes {
         KEYMAP_STRING = SAFE_RANGE,
-        COLEMAK_CTRL
+        COLEMAK_CTRL,
+        LAYER_SWITCH
     };
 
     bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -21,8 +22,30 @@ enum ferris_layers {
                 if (record->event.pressed) {
                     if (get_mods() & MOD_MASK_SHIFT) {
                         process_magic(MAGIC_TOGGLE_CTL_GUI, record);
+                    }
+                }
+                return false;
+
+            case LAYER_SWITCH:
+                if (record->event.pressed) {
+                    if (get_mods() & MOD_MASK_SHIFT) {
+                        unregister_code((uint8_t)LAYER_SWITCH);
+                        unregister_code(KC_MS_BTN2);
+                        clear_mods();
+                        layer_on(MOUSE);
+                    } else if (get_mods() & MOD_MASK_CTRL) {
+                        layer_on(NUMBERS);
+                        clear_mods();
                     } else {
-                        send_string(keymapstring);
+                        layer_on(NAVIGATION);
+                        clear_mods();
+                    }
+                } else {
+                    if (IS_LAYER_ON(NUMBERS)) {
+                        layer_off(NUMBERS);
+                    }
+                    if (IS_LAYER_ON(NAVIGATION)) {
+                        layer_off(NAVIGATION);
                     }
                 }
                 return false;
@@ -30,6 +53,8 @@ enum ferris_layers {
             case COLEMAK_CTRL:
                 if (record->event.pressed) {
                     layer_off(MOUSE);
+                    layer_off(NUMBERS);
+                    layer_off(NAVIGATION);
                     register_code(KC_LCTRL);
                 }
         }
@@ -44,31 +69,19 @@ enum ferris_layers {
 
 // endregion
 
-// region Key Overrides
     const key_override_t comma_semicolon_key_override =         ko_make_basic(MOD_MASK_SHIFT, KC_COMMA,                 KC_SEMICOLON);              // , ;
     const key_override_t dot_colon_key_override =               ko_make_basic(MOD_MASK_SHIFT, KC_DOT,                   KC_COLON);                  // . :
     const key_override_t exclaim_question_key_override =        ko_make_basic(MOD_MASK_SHIFT, KC_EXCLAIM,               KC_QUESTION);               // ! ?
-
 
     const key_override_t parend_key_override =                  ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_PAREN,            KC_RIGHT_PAREN);            // ( )
     const key_override_t brace_key_override =                   ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_CURLY_BRACE,      KC_RIGHT_CURLY_BRACE);      // { }
     const key_override_t bracket_key_override =                 ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_BRACKET,          KC_RIGHT_BRACKET);          // [ ]
     const key_override_t abracket_key_override =                ko_make_with_layers_and_negmods(MOD_MASK_SHIFT, KC_LEFT_ANGLE_BRACKET,    KC_RIGHT_ANGLE_BRACKET, ~0, MOD_MASK_ALT);    // < >
 
-    const key_override_t dollar_percent_key_override =          ko_make_basic(MOD_MASK_SHIFT, KC_DOLLAR,                KC_PERCENT);                // $ %
-    const key_override_t octothorpe_at_key_override =           ko_make_basic(MOD_MASK_SHIFT, KC_HASH,                  KC_AT);                     // # @
-    const key_override_t asterisk_carrot_key_override =         ko_make_basic(MOD_MASK_SHIFT, KC_ASTERISK,              KC_CIRCUMFLEX);             // * ^
-    const key_override_t ampersand_pipe_key_override =          ko_make_basic(MOD_MASK_SHIFT, KC_AMPERSAND,             KC_PIPE);                   // & |
+    const key_override_t volumeup_volumedown_key_override =     ko_make_basic(MOD_MASK_SHIFT, KC_AUDIO_VOL_UP,          KC_AUDIO_VOL_DOWN);         // vol-up vol-down
 
-    const key_override_t volumeup_volumedown_key_override =     ko_make_basic(MOD_MASK_SHIFT, KC_AUDIO_VOL_UP,          KC_AUDIO_VOL_DOWN);         // end pgdown
-    const key_override_t f12_f2_key_override =                  ko_make_basic(MOD_MASK_SHIFT, KC_F12,                   KC_F2);                     // F12 F2
-
-    const key_override_t plus_minus_key_override =              ko_make_basic(MOD_MASK_SHIFT, KC_KP_MINUS,              KC_KP_PLUS);                // - +
-    const key_override_t equals_underscore_key_override =       ko_make_basic(MOD_MASK_SHIFT, KC_UNDERSCORE,            KC_EQUAL);                  // _ =
     const key_override_t forwardslash_backslash_key_override =  ko_make_basic(MOD_MASK_SHIFT, KC_SLASH,                 KC_BACKSLASH);              // / backslash
     const key_override_t backspace_delete_key_override =        ko_make_with_layers(MOD_MASK_SHIFT, KC_BSPC,            KC_DEL, (1 << NAVIGATION));    // <- ->
-
-    const key_override_t dot_comma_key_override =               ko_make_with_layers(MOD_MASK_CTRL, KC_KP_DOT,           KC_COMMA, (1 << NUMBERS));  // .   ,
 
     const key_override_t leftspace_key_override =               ko_make_with_layers_and_negmods(0,  KC_LEFT,            LCTL(LGUI(KC_LEFT)), (1 << MOUSE), MOD_MASK_SHIFT);
     const key_override_t rightspace_key_override =              ko_make_with_layers_and_negmods(0,  KC_RIGHT,           LCTL(LGUI(KC_RIGHT)), (1 << MOUSE), MOD_MASK_SHIFT);
@@ -87,11 +100,14 @@ enum ferris_layers {
 
     const key_override_t up_pgup_key_override =                 ko_make_with_layers_and_negmods(MOD_MASK_CTRL, KC_UP,   KC_PAGE_UP, (1 << NAVIGATION), MOD_MASK_ALT);
     const key_override_t down_pgdown_key_override =             ko_make_with_layers_and_negmods(MOD_MASK_CTRL, KC_DOWN, KC_PAGE_DOWN, (1 << NAVIGATION), MOD_MASK_ALT);
+    
+    const key_override_t home_forward_key_override =            ko_make_with_layers(MOD_MASK_ALT, KC_HOME,              KC_MS_BTN5, (1 << NAVIGATION));
+    const key_override_t end_backward_key_override =            ko_make_with_layers(MOD_MASK_ALT, KC_END,               KC_MS_BTN4, (1 << NAVIGATION));
 
     const key_override_t forward_pgdown_key_override =          ko_make_with_layers(MOD_MASK_CTRL, KC_MS_BTN5,          KC_PAGE_UP, (1 << MOUSE));
     const key_override_t backward_pgdown_key_override =         ko_make_with_layers(MOD_MASK_CTRL, KC_MS_BTN4,          KC_PAGE_DOWN, (1 << MOUSE));
 
-    const key_override_t mouse2_mouse3_key_override =           ko_make_with_layers(MOD_MASK_SHIFT, KC_MS_BTN2,          KC_MS_BTN3, (1 << MOUSE));
+    const key_override_t mouse2_mouse3_key_override =           ko_make_with_layers(MOD_MASK_SHIFT, KC_MS_BTN2,         KC_MS_BTN3, (1 << MOUSE));
 
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
@@ -103,21 +119,11 @@ enum ferris_layers {
         &bracket_key_override,
         &abracket_key_override,
 
-        &dollar_percent_key_override,
-        &octothorpe_at_key_override,
-        &asterisk_carrot_key_override,
-        &ampersand_pipe_key_override,
-
         &volumeup_volumedown_key_override,
-        &f12_f2_key_override,
-        
-        &plus_minus_key_override,
-        &equals_underscore_key_override,
+
         &forwardslash_backslash_key_override,
         &backspace_delete_key_override,
         
-        &dot_comma_key_override,
-
         &leftspace_key_override,
         &rightspace_key_override,
         &left_tableft_key_override,
@@ -136,6 +142,9 @@ enum ferris_layers {
         &up_pgup_key_override,
         &down_pgdown_key_override,
 
+        &home_forward_key_override,
+        &end_backward_key_override,
+
         &forward_pgdown_key_override,
         &backward_pgdown_key_override,
 
@@ -148,63 +157,12 @@ enum ferris_layers {
 
 // region Tap Dances
 
-    typedef enum {
-        TD_NONE,
-        TD_UNKNOWN,
-        TD_SINGLE_HOLD,
-        TD_DOUBLE_TAP
-    } td_state_t;
-
-    typedef struct {
-        bool is_press_action;
-        td_state_t state;
-    } td_tap_t;
-
-    enum ferris_tap_dances {
-        TD_LCTRL_LGUI,
-        TD_LayerNav_LayerMouse
+    enum tap_dances {
+        TD_LCTRL_LGUI
     };
-
-    td_state_t cur_dance(qk_tap_dance_state_t *state);
-
-    void ql_finished(qk_tap_dance_state_t *state, void *user_data);
-    void ql_reset(qk_tap_dance_state_t *state, void *user_data);
-
-    td_state_t cur_dance(qk_tap_dance_state_t *state) {
-        if (state->count == 1) return TD_SINGLE_HOLD;
-        else if (state->count == 2) return TD_DOUBLE_TAP;
-        else return TD_UNKNOWN;
-    }
-
-    static td_tap_t ql_tap_state = {
-        .is_press_action = true,
-        .state = TD_NONE
-    };
-
-    void ql_finished(qk_tap_dance_state_t *state, void *user_data) {
-        ql_tap_state.state = cur_dance(state);
-        switch (ql_tap_state.state) {
-            case TD_SINGLE_HOLD:
-                layer_on(NAVIGATION);
-                break;
-            case TD_DOUBLE_TAP:
-                layer_on(MOUSE);
-                break;
-            default:
-                break;
-        }
-    }
-
-    void ql_reset(qk_tap_dance_state_t *state, void *user_data) {
-        if (ql_tap_state.state == TD_SINGLE_HOLD) {
-            layer_off(NAVIGATION);
-        }
-        ql_tap_state.state = TD_NONE;
-    }
 
     qk_tap_dance_action_t tap_dance_actions[] = {
         [TD_LCTRL_LGUI] = ACTION_TAP_DANCE_DOUBLE(KC_LCTL, KC_LGUI),
-        [TD_LayerNav_LayerMouse] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ql_finished, ql_reset)
     };
 
 // endregion
@@ -218,7 +176,7 @@ enum ferris_layers {
     const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT};
 
     combo_t key_combos[COMBO_COUNT] = {
-        [COMMA_DOT_EXCLAIM] =   COMBO(comma_dot_combo, KC_EXCLAIM)
+        [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM)
     };
 
 // endregion
@@ -239,9 +197,9 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_A, KC_R, KC_S, KC_T, KC_D,                                                               KC_H, KC_N, KC_E, KC_I, KC_O,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_Z, KC_X, KC_C, KC_V, KC_B,                                                               KC_K, KC_M, KC_COMMA, KC_DOT, LT(NUMBERS, KC_QUOTE),
+            KC_Z, KC_X, KC_C, KC_V, KC_B,                                                               KC_K, KC_M, KC_COMMA, KC_DOT, KC_QUOTE,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, TD(TD_LayerNav_LayerMouse)
+            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, LAYER_SWITCH
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         ),
 
@@ -249,11 +207,11 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_ESCAPE, KC_PERCENT, KC_AT, KC_CIRCUMFLEX, KC_PIPE,                                       KC_MINS, KC_7, KC_8, KC_9, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_COMMA, KC_DOT, KC_UNDERSCORE, KC_SLASH, KC_ASTERISK,                                     KC_PLUS, KC_4, KC_5, KC_6, KC_ENTER,
+            KC_TAB, KC_DOT, KC_COMMA, KC_SLASH, KC_ASTERISK,                                            KC_PLUS, KC_4, KC_5, KC_6, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LALT, KC_F3, KC_F1, KC_F2, KC_GRAVE,                                                     KC_EQUAL, KC_1, KC_2, KC_3, KC_TRANSPARENT,
+            KC_LALT, KC_F3, KC_F1, KC_F2, KC_GRAVE,                                                     KC_EQUAL, KC_1, KC_2, KC_3, KC_0,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, KC_0
+            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, KC_TRANSPARENT
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         ),
 
