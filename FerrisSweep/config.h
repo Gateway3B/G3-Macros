@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #undef TAPPING_TERM
 #define TAPPING_TERM 250
 
-#undef DEBOUNCE
-#define DEBOUNCE 10
+// #undef DEBOUNCE
+// #define DEBOUNCE 10
 
 #define COMBO_COUNT 1
 

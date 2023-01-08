@@ -88,7 +88,7 @@ enum ferris_layers {
     const key_override_t left_tableft_key_override =            ko_make_with_layers(MOD_MASK_SHIFT, KC_LEFT,            LCTL(KC_PAGE_UP), (1 << MOUSE));
     const key_override_t right_tabright_key_override =          ko_make_with_layers(MOD_MASK_SHIFT, KC_RIGHT,           LCTL(KC_PAGE_DOWN), (1 << MOUSE));
 
-    const key_override_t enter_application_key_override =       ko_make_basic(MOD_MASK_ALT, KC_ENTER,                   KC_APPLICATION); // Alt enter combo right clicks
+    const key_override_t enter_application_key_override =       ko_make_basic(MOD_MASK_CTRL, KC_LEFT_PAREN,             KC_APPLICATION); // Control paren combo right clicks
 
     const key_override_t anglebracket_tabrev_key_override =     ko_make_basic(MOD_MASK_SA, KC_LEFT_ANGLE_BRACKET,       LALT(LSFT(KC_TAB))); // App cycle reverse
     const key_override_t dot_tabrev_key_override =              ko_make_basic(MOD_MASK_SA, KC_DOT,                      LALT(LSFT(KC_TAB))); // App cycle reverse
@@ -108,6 +108,8 @@ enum ferris_layers {
     const key_override_t backward_pgdown_key_override =         ko_make_with_layers(MOD_MASK_CTRL, KC_MS_BTN4,          KC_PAGE_DOWN, (1 << MOUSE));
 
     const key_override_t mouse2_mouse3_key_override =           ko_make_with_layers(MOD_MASK_SHIFT, KC_MS_BTN2,         KC_MS_BTN3, (1 << MOUSE));
+
+    const key_override_t ctrl_shft_g_alt_tab_key_override =     ko_make_basic(MOD_MASK_CS, KC_G,                        LALT(LSFT(KC_TAB)));
 
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
@@ -149,6 +151,8 @@ enum ferris_layers {
         &backward_pgdown_key_override,
 
         &mouse2_mouse3_key_override,
+        
+        &ctrl_shft_g_alt_tab_key_override,
 
         NULL
     };
