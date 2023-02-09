@@ -109,7 +109,7 @@ enum ferris_layers {
 
     const key_override_t mouse2_mouse3_key_override =           ko_make_with_layers(MOD_MASK_SHIFT, KC_MS_BTN2,         KC_MS_BTN3, (1 << MOUSE));
 
-    const key_override_t ctrl_shft_g_alt_tab_key_override =     ko_make_basic(MOD_MASK_CS, KC_G,                        LALT(LSFT(KC_TAB)));
+    const key_override_t ctrl_shft_g_alt_tab_key_override =     ko_make_basic(MOD_MASK_CS, KC_G,                        LALT(KC_TAB));
 
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
@@ -175,12 +175,22 @@ enum ferris_layers {
 
     enum combos {
         COMMA_DOT_EXCLAIM,
+        Z_T_HOLDALT,
+        Z_S_HOLDGUI,
+        Z_R_HOLDALT,
     };
 
     const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT};
 
+    const uint16_t PROGMEM z_t_combo[] = {KC_T, KC_Z, COMBO_END};
+    const uint16_t PROGMEM z_s_combo[] = {KC_S, KC_Z, COMBO_END};
+    const uint16_t PROGMEM z_r_combo[] = {KC_R, KC_Z, COMBO_END};
+
     combo_t key_combos[COMBO_COUNT] = {
-        [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM)
+        [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM),
+        [Z_T_HOLDALT] = COMBO(z_t_combo, OSM(MOD_LALT)),
+        [Z_S_HOLDGUI] = COMBO(z_s_combo, OSM(MOD_LGUI)),
+        [Z_R_HOLDALT] = COMBO(z_r_combo, KC_ESC)
     };
 
 // endregion
@@ -235,11 +245,11 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_ESCAPE, KC_MS_WH_LEFT, KC_MS_WH_UP, KC_MS_WH_RIGHT, KC_AUDIO_VOL_UP,                     KC_MS_BTN5, KC_LEFT, KC_MS_UP, KC_RIGHT, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_ACL1, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
+            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_LSFT, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, KEYMAP_STRING,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            COLEMAK_CTRL, KC_LSFT,                                                                      KC_MS_BTN1, KC_MS_BTN2
+            COLEMAK_CTRL, KC_ACL1,                                                                      KC_MS_BTN1, KC_MS_BTN2
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         )
     };
