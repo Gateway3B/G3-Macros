@@ -237,7 +237,7 @@
                         },
                         {
                             "name": "CfgVersion",
-                            "value": "12.23.483.5208"
+                            "value": "13.1.489.3737"
                         },
                         {
                             "name": "CursorOverride",
@@ -449,6 +449,10 @@
                             "value": "1"
                         },
                         {
+                            "name": "ObjectiveVoteScale",
+                            "value": "1.0000"
+                        },
+                        {
                             "name": "PracticeToolScale",
                             "value": "1.0000"
                         },
@@ -490,7 +494,7 @@
                         },
                         {
                             "name": "ShowFPSAndLatency",
-                            "value": "0"
+                            "value": "1"
                         },
                         {
                             "name": "ShowHealthBarShake",
@@ -735,7 +739,7 @@
                         },
                         {
                             "name": "evntPlayerPingDanger",
-                            "value": "[Ctrl][Button 1]"
+                            "value": "[Ctrl][d]"
                         },
                         {
                             "name": "evtCameraLockToggle",
@@ -775,11 +779,11 @@
                         },
                         {
                             "name": "evtChampionOnly",
-                            "value": "[<Unbound>]"
+                            "value": "[Ctrl][x]"
                         },
                         {
                             "name": "evtChatHistory",
-                            "value": "[Shift][z],"
+                            "value": "[Ctrl][z]"
                         },
                         {
                             "name": "evtDisableDirectedCamera",
@@ -967,7 +971,7 @@
                         },
                         {
                             "name": "evtPlayerStopPosition",
-                            "value": "[Shift][q]"
+                            "value": "[Shift][z]"
                         },
                         {
                             "name": "evtPracticeToolIncGold",
@@ -975,6 +979,10 @@
                         },
                         {
                             "name": "evtPracticeToolResetCooldown",
+                            "value": "[<Unbound>]"
+                        },
+                        {
+                            "name": "evtPracticeToolResetHP",
                             "value": "[<Unbound>]"
                         },
                         {
@@ -1035,19 +1043,19 @@
                         },
                         {
                             "name": "evtSelectAlly1",
-                            "value": "[Ctrl][q]"
+                            "value": "[Shift][q]"
                         },
                         {
                             "name": "evtSelectAlly2",
-                            "value": "[Ctrl][w]"
+                            "value": "[Shift][w]"
                         },
                         {
                             "name": "evtSelectAlly3",
-                            "value": "[Ctrl][f]"
+                            "value": "[Shift][f]"
                         },
                         {
                             "name": "evtSelectAlly4",
-                            "value": "[Ctrl][p]"
+                            "value": "[Shift][p]"
                         },
                         {
                             "name": "evtSelectChaosPlayer1",
@@ -1067,7 +1075,7 @@
                         },
                         {
                             "name": "evtSelectSelf",
-                            "value": "[Ctrl][1]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSelfCastAvatarSpell1",
@@ -1159,19 +1167,19 @@
                         },
                         {
                             "name": "evtSmartCastItem1",
-                            "value": "[Shift][1]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSmartCastItem2",
-                            "value": "[Shift][2]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSmartCastItem3",
-                            "value": "[Shift][3]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSmartCastItem4",
-                            "value": "[Shift][5]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSmartCastItem5",
@@ -1199,7 +1207,7 @@
                         },
                         {
                             "name": "evtSmartCastVisionItem",
-                            "value": "[Shift][4]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtSmartCastWithIndicatorAvatarSpell1",
@@ -1211,19 +1219,19 @@
                         },
                         {
                             "name": "evtSmartCastWithIndicatorItem1",
-                            "value": ""
+                            "value": "[Ctrl][q]"
                         },
                         {
                             "name": "evtSmartCastWithIndicatorItem2",
-                            "value": ""
+                            "value": "[Ctrl][w]"
                         },
                         {
                             "name": "evtSmartCastWithIndicatorItem3",
-                            "value": "[Shift][f]"
+                            "value": "[Ctrl][f]"
                         },
                         {
                             "name": "evtSmartCastWithIndicatorItem4",
-                            "value": ""
+                            "value": "[Ctrl][g]"
                         },
                         {
                             "name": "evtSmartCastWithIndicatorItem5",
@@ -1251,7 +1259,7 @@
                         },
                         {
                             "name": "evtSmartCastWithIndicatorVisionItem",
-                            "value": "[Shift][p]"
+                            "value": "[Ctrl][p]"
                         },
                         {
                             "name": "evtSmartPlusSelfCastAvatarSpell1",
@@ -1423,7 +1431,7 @@
                         },
                         {
                             "name": "evtUseItem5",
-                            "value": "[Ctrl][g]"
+                            "value": "[<Unbound>]"
                         },
                         {
                             "name": "evtUseItem6",
@@ -1460,7 +1468,7 @@
                         },
                         {
                             "name": "evtToggleFPSAndLatency",
-                            "value": "[<Unbound>]"
+                            "value": "[Button 3]"
                         },
                         {
                             "name": "evtToggleMouseClip",
