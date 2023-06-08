@@ -21,12 +21,12 @@ OnExplorerRestart(wParam, lParam, msg, hwnd)
 
 global Monitors:=[]
 
-SysGet, Mon, Monitor, 3
-Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
-SysGet, Mon, Monitor, 4
-Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
-SysGet, Mon, Monitor, 5
-Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
+Loop, 5 {
+    SysGet, Mon, Monitor, %A_Index%
+    if (MonLeft > 0 || MonTop < 0) {
+        Monitors.Push({Left: MonLeft, Right: MonRight, Top: MonTop, Bottom: MonBottom})
+    }
+}
 
 ; Windows 10 desktop changes listener
 DllCall(RegisterPostMessageHookProc, Int, hwnd, Int, 0x1400 + 30)
