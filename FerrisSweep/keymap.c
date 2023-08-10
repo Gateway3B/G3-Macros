@@ -69,7 +69,8 @@ enum ferris_layers {
 
 // endregion
 
-    const key_override_t comma_semicolon_key_override =         ko_make_basic(MOD_MASK_SHIFT, KC_COMMA,                 KC_SEMICOLON);              // , ;
+    const key_override_t comma_semicolon_key_override =         ko_make_with_layers(MOD_MASK_SHIFT, KC_COMMA,           KC_SEMICOLON, (1 << COLEMAK));  // , ;
+    const key_override_t comma_s_key_override =                 ko_make_with_layers(MOD_MASK_SHIFT, KC_COMMA,           LSFT(KC_S), (1 << NUMBERS));      // , S
     const key_override_t dot_colon_key_override =               ko_make_basic(MOD_MASK_SHIFT, KC_DOT,                   KC_COLON);                  // . :
     const key_override_t exclaim_question_key_override =        ko_make_basic(MOD_MASK_SHIFT, KC_EXCLAIM,               KC_QUESTION);               // ! ?
 
@@ -111,8 +112,16 @@ enum ferris_layers {
 
     const key_override_t ctrl_shft_g_alt_tab_key_override =     ko_make_basic(MOD_MASK_CS, KC_G,                        LALT(KC_TAB));
 
+    const key_override_t ctrl_plus_nokey_key_override =         ko_make_basic(MOD_MASK_CTRL, KC_PLUS,                   KC_NO);
+    const key_override_t ctrl_minus_nokey_key_override =        ko_make_basic(MOD_MASK_CTRL, KC_KP_MINUS,               KC_NO);
+    const key_override_t ctrl_underscore_nokey_key_override =   ko_make_basic(MOD_MASK_CTRL, KC_UNDERSCORE,             KC_NO);
+
+    const key_override_t ctrl_space_gui_key_override =          ko_make_with_layers(MOD_MASK_CTRL, KC_SPACE,            KC_LGUI, (1 << COLEMAK));
+    const key_override_t shift_minus_alt_key_override =         ko_make_with_layers(MOD_MASK_SHIFT, KC_SPACE,           KC_LALT, (1 << COLEMAK));
+
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
+        &comma_s_key_override,
         &dot_colon_key_override,
         &exclaim_question_key_override,
 
@@ -153,6 +162,12 @@ enum ferris_layers {
         &mouse2_mouse3_key_override,
         
         &ctrl_shft_g_alt_tab_key_override,
+        &ctrl_plus_nokey_key_override,
+        &ctrl_minus_nokey_key_override,
+        &ctrl_underscore_nokey_key_override,
+
+        &ctrl_space_gui_key_override,
+        &shift_minus_alt_key_override,
 
         NULL
     };
@@ -223,7 +238,7 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_TAB, KC_DOT, KC_COMMA, KC_SLASH, KC_ASTERISK,                                            KC_PLUS, KC_4, KC_5, KC_6, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LALT, KC_F3, KC_F1, KC_F2, KC_GRAVE,                                                     KC_EQUAL, KC_1, KC_2, KC_3, KC_0,
+            KC_LALT, KC_LGUI, KC_F1, KC_F2, KC_GRAVE,                                                   KC_EQUAL, KC_1, KC_2, KC_3, KC_0,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, KC_TRANSPARENT
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
@@ -245,9 +260,9 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_ESCAPE, KC_MS_WH_LEFT, KC_MS_WH_UP, KC_MS_WH_RIGHT, KC_AUDIO_VOL_UP,                     KC_MS_BTN5, KC_LEFT, KC_MS_UP, KC_RIGHT, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_LSFT, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
+            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_LSFT, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ACL1,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, KEYMAP_STRING,
+            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             COLEMAK_CTRL, KC_ACL1,                                                                      KC_MS_BTN1, KC_MS_BTN2
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
