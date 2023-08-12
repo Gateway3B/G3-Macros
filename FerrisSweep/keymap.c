@@ -115,9 +115,10 @@ enum ferris_layers {
     const key_override_t ctrl_plus_nokey_key_override =         ko_make_basic(MOD_MASK_CTRL, KC_PLUS,                   KC_NO);
     const key_override_t ctrl_minus_nokey_key_override =        ko_make_basic(MOD_MASK_CTRL, KC_KP_MINUS,               KC_NO);
     const key_override_t ctrl_underscore_nokey_key_override =   ko_make_basic(MOD_MASK_CTRL, KC_UNDERSCORE,             KC_NO);
+    const key_override_t ctrl_equals_nokey_key_override =       ko_make_basic(MOD_MASK_CTRL, KC_EQUAL,                  KC_NO);
 
     const key_override_t ctrl_space_gui_key_override =          ko_make_with_layers(MOD_MASK_CTRL, KC_SPACE,            KC_LGUI, (1 << COLEMAK));
-    const key_override_t shift_minus_alt_key_override =         ko_make_with_layers(MOD_MASK_SHIFT, KC_SPACE,           KC_LALT, (1 << COLEMAK));
+    // const key_override_t shift_minus_alt_key_override =         ko_make_with_layers(MOD_MASK_SHIFT, KC_SPACE,           KC_LALT, (1 << COLEMAK));
 
     const key_override_t **key_overrides = (const key_override_t *[]) {
         &comma_semicolon_key_override,
@@ -162,12 +163,14 @@ enum ferris_layers {
         &mouse2_mouse3_key_override,
         
         &ctrl_shft_g_alt_tab_key_override,
+
         &ctrl_plus_nokey_key_override,
         &ctrl_minus_nokey_key_override,
         &ctrl_underscore_nokey_key_override,
+        &ctrl_equals_nokey_key_override,
 
         &ctrl_space_gui_key_override,
-        &shift_minus_alt_key_override,
+        // &shift_minus_alt_key_override,
 
         NULL
     };
