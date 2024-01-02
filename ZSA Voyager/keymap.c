@@ -9,15 +9,18 @@ enum custom_keycodes {
     MAC_LOCK,
     COLEMAK_CONTROL,
     CHROME_TAB_LEFT,
-    VSCODE_TAB_LEFT,
+    TAB_LEFT,
     APP_CYCLE,
     CHROME_TAB_RIGHT,
-    VSCODE_TAB_RIGHT,
-    APP_CYCLE_REVERSE
+    TAB_RIGHT,
+    APP_CYCLE_REVERSE,
+    QWERTY_ON,
+    QWERTY_OFF,
 };
 
 enum voyager_layers {
     COLEMAK,
+    QWERTY,
     NAVIGATION,
     NUMBERS,
     MOUSE,
@@ -30,11 +33,18 @@ enum voyager_layers {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [COLEMAK] = LAYOUT_voyager(
-        KC_ESCAPE,           KC_LALT, KC_AUDIO_VOL_UP, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_NEXT_TRACK, KC_LGUI,             KC_LALT,               KC_MS_BTN4,    KC_PSCREEN, KC_MS_BTN5, KC_LGUI,   MAC_SPOTLIGHT,
-        CHROME_TAB_LEFT ,    KC_Q,    KC_W,            KC_F,                KC_P,                KC_G,                KC_J,                  KC_L,          KC_U,       KC_Y,       KC_BSPACE, CHROME_TAB_RIGHT,
-        VSCODE_TAB_LEFT,     KC_A,    KC_R,            KC_S,                KC_T,                KC_D,                KC_H,                  KC_N,          KC_E,       KC_I,       KC_O,      VSCODE_TAB_RIGHT,
+        KC_ESCAPE,         QWERTY_ON, KC_AUDIO_VOL_UP, KC_MEDIA_PLAY_PAUSE, KC_MEDIA_NEXT_TRACK, QWERTY_OFF,          MAGIC_SWAP_LCTL_LGUI,  KC_MS_BTN4,    KC_PSCREEN, KC_MS_BTN5, MAGIC_UNSWAP_LCTL_LGUI,   MAC_SPOTLIGHT,
+        KC_LGUI ,            KC_Q,    KC_W,            KC_F,                KC_P,                KC_G,                KC_J,                  KC_L,          KC_U,       KC_Y,       KC_BSPACE, KC_LALT,
+        TAB_LEFT,            KC_A,    KC_R,            KC_S,                KC_T,                KC_D,                KC_H,                  KC_N,          KC_E,       KC_I,       KC_O,      TAB_RIGHT,
         APP_CYCLE,           KC_Z,    KC_X,            KC_C,                KC_V,                KC_B,                KC_K,                  KC_M,          KC_COMMA,   KC_DOT,     KC_QUOTE,  APP_CYCLE_REVERSE,
                                                                             KC_LCTRL,            KC_LSHIFT,           LT(NUMBERS, KC_SPACE), MO(NAVIGATION)
+    ),
+    [QWERTY] = LAYOUT_voyager(
+        KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,               KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
+        KC_TRANSPARENT, KC_Q,           KC_W,           KC_E,           KC_R,           KC_T,                         KC_Y,           KC_U,           KC_I,           KC_O,           KC_P,           KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_A,           KC_S,           KC_D,           KC_F,           KC_G,                         KC_H,           KC_J,           KC_K,           KC_L,           KC_BSPACE,      KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_Z,           KC_X,           KC_C,           KC_V,           KC_B,                         KC_N,           KC_M,           KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,
+                                                                        KC_TRANSPARENT, KC_TRANSPARENT,               KC_TRANSPARENT, KC_TRANSPARENT
     ),
     [NAVIGATION] = LAYOUT_voyager(
         KC_F1,          KC_F2,     KC_F3,   KC_F4,   KC_F5,          KC_F6,                                           KC_F7,          KC_F8,         KC_F9,   KC_F10,         KC_F11,    KC_F12,
@@ -47,7 +57,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,               KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, RESET,
         KC_TRANSPARENT, KC_ESCAPE,      KC_PERC,        KC_AT,          KC_CIRC,        KC_PIPE,                      KC_MINUS,       KC_7,           KC_8,           KC_9,           KC_BSPACE,      KC_TRANSPARENT,
         KC_TRANSPARENT, KC_TAB,         KC_DOT,         KC_COMMA,       KC_SLASH,       KC_ASTR,                      KC_PLUS,        KC_4,           KC_5,           KC_6,           KC_ENTER,       KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_LALT,        KC_F5,          KC_F1,          KC_F2,          KC_GRAVE,                     KC_EQUAL,       KC_1,           KC_2,           KC_3,           KC_0,           KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_LALT,        KC_F5,          KC_F1,          KC_F2,          KC_SPACE,                     KC_EQUAL,       KC_1,           KC_2,           KC_3,           KC_0,           KC_TRANSPARENT,
                                                                         KC_TRANSPARENT, KC_TRANSPARENT,               KC_TRANSPARENT, KC_TRANSPARENT
     ),
     [MOUSE] = LAYOUT_voyager(
@@ -168,7 +178,38 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
 ////////////////RGB
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+uint8_t coords_to_led_pin(uint8_t row, uint8_t col) {
+    uint8_t temp = 0;
+
+    if (row < 4) {
+        col--;
+    } else if (row == 4) {
+        row = 3;
+        col = 5;
+    } else if (row == 5) {
+        row--;
+    } else {
+        temp += 26;
+        row -= 6;
+        if (row == 4) {
+            row = 3;
+            col = 0;
+        } else if (row == 5) {
+            row--;
+            col -= 5;
+        }
+    }
+
+    return temp + (row * 6) + col;
+}
+
 static uint8_t LAST_KEY = DRIVER_LED_TOTAL;
+
+static uint8_t SWAPPED_GUI_CTRL = 26;
+static uint8_t UNSWAPPED_GUI_CTRL = 30;
+
+static uint8_t SWAPPED_QWERTY = 1;
+static uint8_t UNSWAPPED_QWERTY = 5;
 
 extern rgb_config_t rgb_matrix_config;
 
@@ -188,7 +229,16 @@ const uint8_t PROGMEM ledmap[][DRIVER_LED_TOTAL][3] = {
 
 void set_layer_color(int layer) {
     for (int i = 0; i < DRIVER_LED_TOTAL; i++) {
-        if (i == LAST_KEY) {
+
+        bool is_last_key = i == LAST_KEY;
+
+        bool is_swapped_gui_ctrl = keymap_config.swap_lctl_lgui && i == SWAPPED_GUI_CTRL;
+        bool is_unswapped_gui_ctrl = !keymap_config.swap_lctl_lgui && i == UNSWAPPED_GUI_CTRL;
+
+        bool is_swapped_qwerty = layer_state_is(QWERTY) && i == SWAPPED_QWERTY;
+        bool is_unswapped_qwerty = !layer_state_is(QWERTY) && i == UNSWAPPED_QWERTY;
+
+        if (is_last_key || is_swapped_gui_ctrl || is_swapped_gui_ctrl || is_unswapped_gui_ctrl || is_swapped_qwerty || is_unswapped_qwerty) {
             float f = (float)UINT8_MAX;
             rgb_matrix_set_color(i, f, f, f);
             continue;
@@ -274,8 +324,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             HCS(0x29F);
             break;
         case MAC_SPOTLIGHT:
-            HCS(0x221);
             layer_off(MOUSE);
+            HCS(0x221);
             break;
         case MAC_LOCK:
             HCS(0x19E);
@@ -285,6 +335,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 layer_off(MOUSE);
                 register_ctrl();
+            }
+            break;
+
+        case QWERTY_ON:
+            if (record->event.pressed) {
+                layer_on(QWERTY);
+            }
+            break;
+
+        case QWERTY_OFF:
+            if (record->event.pressed) {
+                layer_off(QWERTY);
             }
             break;
 
@@ -330,53 +392,25 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
 
-        case VSCODE_TAB_LEFT:
+        case TAB_LEFT:
             if (record->event.pressed) {
-                if (get_mods() & MOD_MASK_SHIFT) {
-                    unregister_code(KC_LSFT);
-                    register_code(KC_LCTL);
-                    register_code(KC_TAB);
+                register_ctrl();
+                register_code(KC_LSFT);
+                register_code(KC_TAB);
 
-                    unregister_code(KC_LCTL);
-                    unregister_code(KC_TAB);
-                    register_code(KC_LSFT);
-                } else {
-                    if (keymap_config.swap_lctl_lgui) {
-                        register_code(KC_LCTL);
-                        register_code(KC_LALT);
-                        register_code(KC_LEFT);
-
-                        unregister_code(KC_LCTL);
-                        unregister_code(KC_LALT);
-                        unregister_code(KC_LEFT);
-                    } else {
-                        register_code(KC_LCTL);
-                        register_code(KC_PGUP);
-
-                        unregister_code(KC_PGUP);
-                        unregister_code(KC_LCTL);
-                    }
-                }
+                unregister_ctrl();
+                unregister_code(KC_LSFT);
+                unregister_code(KC_TAB);
             }
             break;
 
-        case VSCODE_TAB_RIGHT:
+        case TAB_RIGHT:
             if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_code(KC_LCTL);
-                    register_code(KC_LALT);
-                    register_code(KC_RIGHT);
+                register_ctrl();
+                register_code(KC_TAB);
 
-                    unregister_code(KC_LCTL);
-                    unregister_code(KC_LALT);
-                    unregister_code(KC_RIGHT);
-                } else {
-                    register_code(KC_LCTL);
-                    register_code(KC_PGDN);
-
-                    unregister_code(KC_PGDN);
-                    unregister_code(KC_LCTL);
-                }
+                unregister_ctrl();
+                unregister_code(KC_TAB);
             }
             break;
 
@@ -412,28 +446,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         uint8_t row = record->event.key.row;
         uint8_t col = record->event.key.col;
 
-        LAST_KEY = 0;
-
-        if (row < 4) {
-            col--;
-        } else if (row == 4) {
-            row = 3;
-            col = 5;
-        } else if (row == 5) {
-            row--;
-        } else {
-            LAST_KEY += 26;
-            row -= 6;
-            if (row == 4) {
-                row = 3;
-                col = 0;
-            } else if (row == 5) {
-                row--;
-                col -= 5;
-            }
-        }
-
-        LAST_KEY += (row * 6) + col;
+        LAST_KEY = coords_to_led_pin(row, col);
     }
 
   return true;
