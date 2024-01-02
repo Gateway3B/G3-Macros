@@ -11,56 +11,30 @@ enum ferris_layers {
 // region Custom Keycodes
 
     enum custom_keycodes {
-        KEYMAP_STRING = SAFE_RANGE,
-        COLEMAK_CTRL,
-        LAYER_SWITCH
+        COLEMAK_CTRL = SAFE_RANGE,
     };
 
     bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         switch (keycode) {
-            case KEYMAP_STRING:
-                if (record->event.pressed) {
-                    if (get_mods() & MOD_MASK_SHIFT) {
-                        process_magic(MAGIC_TOGGLE_CTL_GUI, record);
-                    }
-                }
-                return false;
-
-            case LAYER_SWITCH:
-                if (record->event.pressed) {
-                    if (get_mods() & MOD_MASK_SHIFT) {
-                        unregister_code((uint8_t)LAYER_SWITCH);
-                        unregister_code(KC_MS_BTN2);
-                        clear_mods();
-                        layer_on(MOUSE);
-                    } else if (get_mods() & MOD_MASK_CTRL) {
-                        layer_on(NUMBERS);
-                        clear_mods();
-                    } else {
-                        layer_on(NAVIGATION);
-                        clear_mods();
-                    }
-                } else {
-                    if (IS_LAYER_ON(NUMBERS)) {
-                        layer_off(NUMBERS);
-                    }
-                    if (IS_LAYER_ON(NAVIGATION)) {
-                        layer_off(NAVIGATION);
-                    }
-                }
-                return false;
-
             case COLEMAK_CTRL:
                 if (record->event.pressed) {
                     layer_off(MOUSE);
                     layer_off(NUMBERS);
                     layer_off(NAVIGATION);
-                    register_code(KC_LCTRL);
+                    if (keymap_config.swap_lctl_lgui) {
+                        register_code(KC_LGUI);
+                    } else {
+                        register_code(KC_LCTRL);
+                    }
                 }
         }
 
         if (record->event.key.col == 0 && record->event.key.row == 3 && !(record->event.pressed)) {
-            unregister_code(KC_LCTRL);
+            if (keymap_config.swap_lctl_lgui) {
+                unregister_code(KC_LGUI);
+            } else {
+                unregister_code(KC_LCTRL);
+            }
             clear_mods();
         }
 
@@ -193,23 +167,27 @@ enum ferris_layers {
 
     enum combos {
         COMMA_DOT_EXCLAIM,
-        Z_T_HOLDALT,
-        Z_S_HOLDGUI,
-        Z_R_HOLDALT,
+        SPACE_LAYER
     };
 
     const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT};
-
-    const uint16_t PROGMEM z_t_combo[] = {KC_T, KC_Z, COMBO_END};
-    const uint16_t PROGMEM z_s_combo[] = {KC_S, KC_Z, COMBO_END};
-    const uint16_t PROGMEM z_r_combo[] = {KC_R, KC_Z, COMBO_END};
+    const uint16_t PROGMEM space_layer_combo[] = {LT(NUMBERS, KC_SPACE), MO(NAVIGATION), COMBO_END};
 
     combo_t key_combos[COMBO_COUNT] = {
         [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM),
-        [Z_T_HOLDALT] = COMBO(z_t_combo, OSM(MOD_LALT)),
-        [Z_S_HOLDGUI] = COMBO(z_s_combo, OSM(MOD_LGUI)),
-        [Z_R_HOLDALT] = COMBO(z_r_combo, KC_ESC)
+        [SPACE_LAYER] = COMBO_ACTION(space_layer_combo)
     };
+
+    void process_combo_event(uint16_t combo_index, bool pressed) {
+        switch(combo_index) {
+            case SPACE_LAYER:
+                if (pressed) {
+                    layer_on(MOUSE);
+                    register_code(KC_ACL1);
+                }
+                break;
+        }
+    }
 
 // endregion
 
@@ -229,9 +207,9 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_A, KC_R, KC_S, KC_T, KC_D,                                                               KC_H, KC_N, KC_E, KC_I, KC_O,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_Z, KC_X, KC_C, KC_V, KC_B,                                                               KC_K, KC_M, KC_COMMA, KC_DOT, KC_QUOTE,
+            KC_Z, KC_X, KC_C, KC_V, KC_B,                                                               KC_K, KC_M, KC_COMMA, KC_DOT, MT(MOD_RGUI, KC_QUOTE),
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, LAYER_SWITCH
+            TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 LT(NUMBERS, KC_SPACE), MO(NAVIGATION)
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         ),
 
@@ -253,7 +231,7 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_TAB, KC_LEFT_ANGLE_BRACKET, KC_LEFT_PAREN, KC_LEFT_CURLY_BRACE, KC_LEFT_BRACKET,         KC_END, KC_LEFT, KC_DOWN, KC_RIGHT, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LALT, KC_F10, KC_F11, KC_F12, KC_GRAVE,                                                  KC_PLUS, KC_KP_MINUS, KC_UNDERSCORE, KC_EQUAL, KC_SLASH,
+            KC_LALT, KC_F10, KC_F11, KC_F12, KC_GRAVE,                                                  KC_PLUS, KC_MINUS, KC_UNDERSCORE, KC_EQUAL, KC_SLASH,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             TD(TD_LCTRL_LGUI), KC_LSFT,                                                                 KC_SPACE, KC_TRANSPARENT
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
@@ -263,11 +241,11 @@ enum ferris_layers {
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
             KC_ESCAPE, KC_MS_WH_LEFT, KC_MS_WH_UP, KC_MS_WH_RIGHT, KC_AUDIO_VOL_UP,                     KC_MS_BTN5, KC_LEFT, KC_MS_UP, KC_RIGHT, KC_BSPC,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_TAB, KC_ACL2, KC_MS_WH_DOWN, KC_LSFT, KC_MEDIA_PLAY_PAUSE,                               KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ACL1,
+            KC_ACL2, KC_ACL1, KC_MS_WH_DOWN, KC_ACL0, KC_MEDIA_PLAY_PAUSE,                              KC_MS_BTN4, KC_MS_LEFT, KC_MS_DOWN, KC_MS_RIGHT, KC_ENTER,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, KC_ENTER,
+            KC_LCTRL, KC_LGUI, KC_LALT, KC_PRINT_SCREEN, KC_PAUSE,                                      KC_RALT, KC_RGUI, KC_SCROLL_LOCK, KC_RCTRL, MAGIC_TOGGLE_CTL_GUI,
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
-            COLEMAK_CTRL, KC_ACL1,                                                                      KC_MS_BTN1, KC_MS_BTN2
+            COLEMAK_CTRL, KC_LSFT,                                                                      KC_MS_BTN1, KC_MS_BTN2
             //---------------------------------------------------------------------------------------   ---------------------------------------------------------------------------------------
         )
     };
