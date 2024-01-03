@@ -8,11 +8,9 @@ enum custom_keycodes {
     MAC_SPOTLIGHT,
     MAC_LOCK,
     COLEMAK_CONTROL,
-    CHROME_TAB_LEFT,
     TAB_LEFT,
-    APP_CYCLE,
-    CHROME_TAB_RIGHT,
     TAB_RIGHT,
+    APP_CYCLE,
     APP_CYCLE_REVERSE,
     QWERTY_ON,
     QWERTY_OFF,
@@ -319,6 +317,14 @@ void unregister_gui(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!(record->event.pressed)) {
+        if (record->event.key.col == 0 && record->event.key.row == 5) {
+            unregister_ctrl();
+            clear_mods();
+        }
+        return true;
+    }
+
     switch (keycode) {
         case MAC_MISSION_CONTROL:
             HCS(0x29F);
@@ -332,122 +338,61 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
 
         case COLEMAK_CONTROL:
-            if (record->event.pressed) {
-                layer_off(MOUSE);
-                register_ctrl();
-            }
+            layer_off(MOUSE);
+            register_ctrl();
+
             break;
 
         case QWERTY_ON:
-            if (record->event.pressed) {
-                layer_on(QWERTY);
-            }
+            layer_on(QWERTY);
+
             break;
 
         case QWERTY_OFF:
-            if (record->event.pressed) {
-                layer_off(QWERTY);
-            }
-            break;
+            layer_off(QWERTY);
 
-        case CHROME_TAB_LEFT:
-            if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_code(KC_LCTL);
-                    register_code(KC_LGUI);
-                    register_code(KC_LEFT);
-
-                    unregister_code(KC_LCTL);
-                    unregister_code(KC_LGUI);
-                    unregister_code(KC_LEFT);
-                } else {
-                    register_code(KC_LCTL);
-                    register_code(KC_LSFT);
-                    register_code(KC_TAB);
-
-                    unregister_code(KC_TAB);
-                    unregister_code(KC_LSFT);
-                    unregister_code(KC_LCTL);
-                }
-            }
-            break;
-
-        case CHROME_TAB_RIGHT:
-            if (record->event.pressed) {
-                if (keymap_config.swap_lctl_lgui) {
-                    register_code(KC_LCTL);
-                    register_code(KC_LGUI);
-                    register_code(KC_RIGHT);
-
-                    unregister_code(KC_LCTL);
-                    unregister_code(KC_LGUI);
-                    unregister_code(KC_RIGHT);
-                } else {
-                    register_code(KC_LCTL);
-                    register_code(KC_TAB);
-
-                    unregister_code(KC_TAB);
-                    unregister_code(KC_LCTL);
-                }
-            }
             break;
 
         case TAB_LEFT:
-            if (record->event.pressed) {
-                register_ctrl();
-                register_code(KC_LSFT);
-                register_code(KC_TAB);
+            register_code(KC_LALT);
+            register_code(KC_PGUP);
 
-                unregister_ctrl();
-                unregister_code(KC_LSFT);
-                unregister_code(KC_TAB);
-            }
+            unregister_code(KC_LALT);
+            unregister_code(KC_PGUP);
+
             break;
 
         case TAB_RIGHT:
-            if (record->event.pressed) {
-                register_ctrl();
-                register_code(KC_TAB);
+            register_code(KC_LALT);
+            register_code(KC_PGDOWN);
 
-                unregister_ctrl();
-                unregister_code(KC_TAB);
-            }
+            unregister_code(KC_LALT);
+            unregister_code(KC_PGDOWN);
+
             break;
 
         case APP_CYCLE:
-            if (record->event.pressed) {
-                register_code(KC_LALT);
-                register_code(KC_TAB);
+            register_code(KC_LALT);
+            register_code(KC_TAB);
 
-                unregister_code(KC_TAB);
-                unregister_code(KC_LALT);
-            }
+            unregister_code(KC_TAB);
+            unregister_code(KC_LALT);
+
             break;
 
         case APP_CYCLE_REVERSE:
-            if (record->event.pressed) {
-                register_code(KC_LSFT);
-                register_code(KC_LALT);
-                register_code(KC_TAB);
+            register_code(KC_LSFT);
+            register_code(KC_LALT);
+            register_code(KC_TAB);
 
-                unregister_code(KC_TAB);
-                unregister_code(KC_LALT);
-                unregister_code(KC_LSFT);
-            }
+            unregister_code(KC_TAB);
+            unregister_code(KC_LALT);
+            unregister_code(KC_LSFT);
+
             break;
     }
 
-    if (record->event.key.col == 0 && record->event.key.row == 5 && !(record->event.pressed)) {
-        unregister_ctrl();
-        clear_mods();
-    }
+    LAST_KEY = coords_to_led_pin(record->event.key.row, record->event.key.col);
 
-    if (record->event.pressed) {
-        uint8_t row = record->event.key.row;
-        uint8_t col = record->event.key.col;
-
-        LAST_KEY = coords_to_led_pin(row, col);
-    }
-
-  return true;
+    return true;
 }
