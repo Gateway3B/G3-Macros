@@ -175,6 +175,7 @@ bool combo_should_trigger(uint16_t combo_index, combo_t *combo, uint16_t keycode
 }
 
 static bool HOLD_KEYS = false;
+static uint16_t PREV_KEY = 0;
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
     switch(combo_index) {
@@ -188,11 +189,15 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
         case CONTROL_SPACE:
             if (pressed) {
                 if (HOLD_KEYS) {
-                    unregister_code(KC_W);
-                    unregister_code(KC_LSFT);
+                    if (PREV_KEY == KC_W) {
+                        unregister_code(KC_LSFT);
+                    }
+                    unregister_code(PREV_KEY);
                 } else {
-                    register_code(KC_LSFT);
-                    register_code(KC_W);
+                    if (PREV_KEY == KC_W) {
+                        register_code(KC_LSFT);
+                    }
+                    register_code(PREV_KEY);
                 }
 
                 HOLD_KEYS = !HOLD_KEYS;
@@ -355,10 +360,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true;
     }
 
-    if (layer_state_is(QWERTY) && HOLD_KEYS) {
-        unregister_code(KC_W);
-        unregister_code(KC_LSFT);
-        HOLD_KEYS = false;
+    if (layer_state_is(QWERTY)) {
+        if (HOLD_KEYS) {
+            if (PREV_KEY == KC_W) {
+                unregister_code(KC_LSFT);
+            }
+            unregister_code(PREV_KEY);
+            HOLD_KEYS = false;
+        } else {
+            PREV_KEY = keycode;
+        }
     }
 
     switch (keycode) {
