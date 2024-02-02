@@ -149,16 +149,32 @@ const key_override_t **key_overrides = (const key_override_t *[]) {
 
 enum combos {
     COMMA_DOT_EXCLAIM,
-    SPACE_LAYER
+    SPACE_LAYER,
+    CONTROL_SPACE
 };
 
 const uint16_t PROGMEM comma_dot_combo[] = {KC_COMMA, KC_DOT, COMBO_END};
 const uint16_t PROGMEM space_layer_combo[] = {LT(NUMBERS, KC_SPACE), MO(NAVIGATION), COMBO_END};
+const uint16_t PROGMEM control_space_combo[] = {KC_SPACE, KC_LCTRL, COMBO_END};
 
 combo_t key_combos[COMBO_COUNT] = {
     [COMMA_DOT_EXCLAIM] = COMBO(comma_dot_combo, KC_EXCLAIM),
-    [SPACE_LAYER] = COMBO_ACTION(space_layer_combo)
+    [SPACE_LAYER] = COMBO_ACTION(space_layer_combo),
+    [CONTROL_SPACE] = COMBO_ACTION(control_space_combo)
 };
+
+bool combo_should_trigger(uint16_t combo_index, combo_t *combo, uint16_t keycode, keyrecord_t *record) {
+    switch (combo_index) {
+        case CONTROL_SPACE:
+            if (!layer_state_is(QWERTY)) {
+                return false;
+            }
+    }
+
+    return true;
+}
+
+static bool HOLD_KEYS = false;
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
     switch(combo_index) {
@@ -166,6 +182,20 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
             if (pressed) {
                 layer_on(MOUSE);
                 register_code(KC_ACL1);
+            }
+            break;
+
+        case CONTROL_SPACE:
+            if (pressed) {
+                if (HOLD_KEYS) {
+                    unregister_code(KC_W);
+                    unregister_code(KC_LSFT);
+                } else {
+                    register_code(KC_LSFT);
+                    register_code(KC_W);
+                }
+
+                HOLD_KEYS = !HOLD_KEYS;
             }
             break;
     }
@@ -323,6 +353,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             clear_mods();
         }
         return true;
+    }
+
+    if (layer_state_is(QWERTY) && HOLD_KEYS) {
+        unregister_code(KC_W);
+        unregister_code(KC_LSFT);
+        HOLD_KEYS = false;
     }
 
     switch (keycode) {
