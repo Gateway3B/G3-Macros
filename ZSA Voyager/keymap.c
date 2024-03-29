@@ -402,11 +402,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
 
         case TAB_LEFT:
-            register_code(KC_LALT);
-            register_code(KC_PGUP);
+            if (get_mods() == (MOD_BIT(KC_LCTL) | MOD_BIT(KC_LSFT))) {
+                unregister_code(KC_LCTL);
+                unregister_code(KC_LSFT);
 
-            unregister_code(KC_LALT);
-            unregister_code(KC_PGUP);
+                register_code(KC_ENTER);
+                unregister_code(KC_ENTER);
+                
+                register_code(KC_LCTL);
+                register_code(KC_LSFT);
+            } else {
+                register_code(KC_LALT);
+                register_code(KC_PGUP);
+
+                unregister_code(KC_LALT);
+                unregister_code(KC_PGUP);
+            }
 
             break;
 
