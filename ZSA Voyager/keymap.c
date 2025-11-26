@@ -14,6 +14,8 @@ enum custom_keycodes {
     APP_CYCLE_CONTROL,
     QWERTY_ON,
     QWERTY_OFF,
+    SCREEN_LEFT,
+    SCREEN_RIGHT
 };
 
 enum voyager_layers {
@@ -60,9 +62,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [MOUSE] = LAYOUT_voyager(
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,      KC_TRANSPARENT,          KC_TRANSPARENT, KC_TRANSPARENT,       KC_TRANSPARENT, KC_TRANSPARENT,       KC_TRANSPARENT, KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_ESCAPE,      KC_MS_WH_LEFT,  KC_MS_WH_UP,    KC_MS_WH_RIGHT,      KC_PAUSE,                KC_MS_BTN5,     LGUI(LCTL(KC_LEFT)),  KC_MS_UP,       LGUI(LCTL(KC_RIGHT)), KC_BSPC,        KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_MS_ACCEL2,   KC_MS_ACCEL1,   KC_MS_WH_DOWN,  KC_MS_ACCEL0,        KC_SCROLL_LOCK,          KC_MS_BTN4,     KC_MS_LEFT,           KC_MS_DOWN,     KC_MS_RIGHT,          COLEMAK_CONTROL,KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_LCTL,        KC_LGUI,        KC_LALT,        MAC_MISSION_CONTROL, KC_SYSTEM_SLEEP,         MAC_LOCK,       QK_MAGIC_TOGGLE_CTL_GUI, KC_RALT,     KC_RGUI,              KC_ENTER,       KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_ESCAPE,      SCREEN_LEFT,    KC_MS_WH_UP,    SCREEN_RIGHT,        KC_PAUSE,                KC_MS_BTN5,     LGUI(LCTL(KC_LEFT)),  KC_MS_UP,       LGUI(LCTL(KC_RIGHT)), KC_BSPC,        KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_MS_ACCEL2,   KC_MS_ACCEL1,   KC_MS_WH_DOWN,  KC_MS_ACCEL0,        KC_SYSTEM_SLEEP,         KC_MS_BTN4,     KC_MS_LEFT,           KC_MS_DOWN,     KC_MS_RIGHT,          COLEMAK_CONTROL,KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_LCTL,        KC_MS_WH_LEFT,  KC_LALT,        KC_MS_WH_RIGHT,      KC_SCROLL_LOCK,          MAC_LOCK,       QK_MAGIC_TOGGLE_CTL_GUI, KC_RALT,     KC_RGUI,              KC_ENTER,       KC_TRANSPARENT,
                                                                         COLEMAK_CONTROL,     KC_TRANSPARENT,          KC_MS_BTN1,     KC_MS_BTN2
     ),
 };
@@ -78,6 +80,7 @@ const key_override_t comma_semicolon_key_override =         ko_make_with_layers(
 const key_override_t comma_s_key_override =                 ko_make_with_layers(MOD_MASK_SHIFT, KC_COMMA,           LSFT(KC_S), (1 << NUMBERS));   // , S
 const key_override_t dot_colon_key_override =               ko_make_basic(MOD_MASK_SHIFT, KC_DOT,                   KC_COLON);                     // . :
 const key_override_t exclaim_question_key_override =        ko_make_basic(MOD_MASK_SHIFT, KC_EXCLAIM,               KC_QUESTION);                  // ! ?
+const key_override_t e_esc_key_override =                   ko_make_basic(MOD_MASK_CTRL,  KC_E,                     KC_ESCAPE);                   // ctrl e
 
 // NAVIGATION
 const key_override_t parend_key_override =                  ko_make_basic(MOD_MASK_SHIFT, KC_LEFT_PAREN,            KC_RIGHT_PAREN);               // ( )
@@ -113,6 +116,7 @@ const key_override_t **key_overrides = (const key_override_t *[]) {
     &comma_s_key_override,
     &dot_colon_key_override,
     &exclaim_question_key_override,
+    &e_esc_key_override,
 
     // NAVIGATION
     &parend_key_override,
@@ -474,6 +478,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             unregister_code(KC_TAB);
             unregister_code(KC_LCTL);
 
+            break;
+
+        case SCREEN_LEFT:
+            if (record->event.pressed) {
+                tap_code(KC_MS_ACCEL2);
+                for (int i = 0; i < 37; i++) {
+                    tap_code(KC_MS_LEFT);
+                }
+                tap_code(KC_MS_ACCEL1);
+            }
+            break;
+
+        case SCREEN_RIGHT:
+        if (record->event.pressed) {
+                tap_code(KC_MS_ACCEL2);
+                for (int i = 0; i < 37; i++) {
+                    tap_code(KC_MS_RIGHT);
+                }
+                tap_code(KC_MS_ACCEL1);
+            }
             break;
     }
 
