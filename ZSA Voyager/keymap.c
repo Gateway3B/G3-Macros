@@ -62,9 +62,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [MOUSE] = LAYOUT_voyager(
         KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT, KC_TRANSPARENT,      KC_TRANSPARENT,          KC_TRANSPARENT, KC_TRANSPARENT,       KC_TRANSPARENT, KC_TRANSPARENT,       KC_TRANSPARENT, KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_ESCAPE,      SCREEN_LEFT,    KC_MS_WH_UP,    SCREEN_RIGHT,        KC_PAUSE,                KC_MS_BTN5,     LGUI(LCTL(KC_LEFT)),  KC_MS_UP,       LGUI(LCTL(KC_RIGHT)), KC_BSPC,        KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_ESCAPE,      KC_MS_WH_LEFT,  KC_MS_WH_UP,    KC_MS_WH_RIGHT,      KC_PAUSE,                KC_MS_BTN5,     LGUI(LCTL(KC_LEFT)),  KC_MS_UP,       LGUI(LCTL(KC_RIGHT)), KC_BSPC,        KC_TRANSPARENT,
         KC_TRANSPARENT, KC_MS_ACCEL2,   KC_MS_ACCEL1,   KC_MS_WH_DOWN,  KC_MS_ACCEL0,        KC_SYSTEM_SLEEP,         KC_MS_BTN4,     KC_MS_LEFT,           KC_MS_DOWN,     KC_MS_RIGHT,          COLEMAK_CONTROL,KC_TRANSPARENT,
-        KC_TRANSPARENT, KC_LCTL,        KC_MS_WH_LEFT,  KC_LALT,        KC_MS_WH_RIGHT,      KC_SCROLL_LOCK,          MAC_LOCK,       QK_MAGIC_TOGGLE_CTL_GUI, KC_RALT,     KC_RGUI,              KC_ENTER,       KC_TRANSPARENT,
+        KC_TRANSPARENT, KC_LCTL,        SCREEN_LEFT,    KC_LALT,        SCREEN_RIGHT,        KC_SCROLL_LOCK,          MAC_LOCK,       QK_MAGIC_TOGGLE_CTL_GUI, KC_RALT,     KC_RGUI,              KC_ENTER,       KC_TRANSPARENT,
                                                                         COLEMAK_CONTROL,     KC_TRANSPARENT,          KC_MS_BTN1,     KC_MS_BTN2
     ),
 };
@@ -482,8 +482,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case SCREEN_LEFT:
             if (record->event.pressed) {
+                unregister_code(KC_MS_UP);
+                unregister_code(KC_MS_DOWN);
+                unregister_code(KC_MS_LEFT);
+                unregister_code(KC_MS_RIGHT);
+
                 tap_code(KC_MS_ACCEL2);
-                for (int i = 0; i < 37; i++) {
+                for (int i = 0; i < 37 * 2; i++) {
                     tap_code(KC_MS_LEFT);
                 }
                 tap_code(KC_MS_ACCEL1);
@@ -492,8 +497,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
         case SCREEN_RIGHT:
         if (record->event.pressed) {
+                unregister_code(KC_MS_UP);
+                unregister_code(KC_MS_DOWN);
+                unregister_code(KC_MS_LEFT);
+                unregister_code(KC_MS_RIGHT);
+
                 tap_code(KC_MS_ACCEL2);
-                for (int i = 0; i < 37; i++) {
+                for (int i = 0; i < 37 * 2; i++) {
                     tap_code(KC_MS_RIGHT);
                 }
                 tap_code(KC_MS_ACCEL1);
